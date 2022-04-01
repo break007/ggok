@@ -19,5 +19,5 @@ jobs:
       run: docker images
     - name: tag Images
       run: docker tag ggok:latest ${{ secrets.DOCKER_USERNAME }}/ggok:latest
-    - name: Push Image 
+    - name: Push Images 
       run: docker push ${{ secrets.DOCKER_USERNAME }}/ggok:latest
