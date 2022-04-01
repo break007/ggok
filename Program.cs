@@ -74,7 +74,7 @@ public class App
             RestRequest reques = new RestRequest("https://ggok.xyz/user/checkin", method: Method.Post);
             reques.AddHeaders(dic);
             var res = client.PostAsync<Result>(reques).Result;
-            System.Console.WriteLine(res.msg);
+            System.Console.WriteLine(res.msg); 
             return true;
         }, 5);
     }
