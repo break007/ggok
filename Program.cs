@@ -9,6 +9,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using FluentScheduler;
 using Newtonsoft.Json;
+Console.WriteLine("net6.0 version");
 App.Run();
 public class App
 {
