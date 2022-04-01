@@ -109,15 +109,15 @@ public class App
             dic["referer"] = "https://ggok.xyz/user/shop";
             reques.AddHeaders(dic);
             reques.AddObject(new { coupon = "", shop = "8", autorenew = "1", disableothers = "1" });
-            var res = client.PostAsync<Result>(reques).Result;
-            Console.WriteLine(res.msg);
+            var res = client?.PostAsync<Result>(reques)?.Result;
+            Console.WriteLine(res?.msg);
             CheckExpirationTimeAndAddSchedule();
             return true;
         });
 
 
     }
-    static void Login(string email, string passwd)
+    static void Login(string? email, string? passwd)
     {
         ErgodicAction(() =>
         {
@@ -128,9 +128,9 @@ public class App
             var res = client.ExecutePostAsync(reques)?.Result;
             if (res?.StatusCode == HttpStatusCode.OK)
             {
-                client.CookieContainer.Add(res?.Cookies);
+                client.CookieContainer.Add(res.Cookies);
                 var json = JsonConvert.DeserializeObject<Result>(res?.Content);
-                Console.WriteLine(json.msg);
+                Console.WriteLine(json?.msg);
                 return true;
             }
             System.Console.WriteLine(res?.ErrorMessage);
