@@ -9,11 +9,31 @@ using System.Net;
 using System.Runtime.InteropServices;
 using FluentScheduler;
 using Newtonsoft.Json;
-Console.WriteLine("net6.0 version");
+using Serilog;
+AutoResetEvent _closingEvent = new AutoResetEvent(false);
+
+#region 配置日志
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateLogger();
+#endregion
+Log.Information("net6.0 version");
+JobManager.Initialize();
 App.Run();
+new q8qserver().Run();
+
+#region 控制台退出快捷键
+_closingEvent.WaitOne();
+Console.CancelKeyPress += ((s, a) =>
+{
+    Log.Information("程序已退出！");
+    _closingEvent.Set();
+});
+#endregion
 public class App
 {
-    static AutoResetEvent _closingEvent = new AutoResetEvent(false);
+
 
     static RestClient client = new RestClient();
     const string Version = "1.0";
@@ -40,7 +60,6 @@ public class App
         #endregion
 
         #region 初始化任务调度
-        JobManager.Initialize();
         ///每3天登录
         JobManager.AddJob(() =>
         {
@@ -55,33 +74,26 @@ public class App
         CheckExpirationTimeAndAddSchedule();
         #endregion
 
-        #region 控制台退出快捷键
-        _closingEvent.WaitOne();
-        Console.CancelKeyPress += ((s, a) =>
-        {
-            Console.WriteLine("程序已退出！");
-            _closingEvent.Set();
-        });
-        #endregion
+
     }
 
 
     #region 请求方法
     static void CheckIn()
     {
-        ErgodicAction(() =>
+        Extensions.ErgodicAction(() =>
         {
-            Console.WriteLine("开始签到");
+            Log.Information("开始签到");
             RestRequest reques = new RestRequest("https://ggok.xyz/user/checkin", method: Method.Post);
             reques.AddHeaders(dic);
             var res = client.PostAsync<Result>(reques).Result;
-            System.Console.WriteLine(res.msg); 
+            Log.Information(res.msg);
             return true;
         }, 5);
     }
     static void CheckExpirationTimeAndAddSchedule()
     {
-        ErgodicAction(() =>
+        Extensions.ErgodicAction(() =>
         {
             RestRequest reques = new RestRequest("https://ggok.xyz/user");
             reques.AddHeaders(dic);
@@ -91,10 +103,10 @@ public class App
             doc.LoadHtml(res);
             var nodes = doc.DocumentNode.SelectNodes("//dd/i[@class='icon icon-md']");
             string dateTime = nodes[0].NextSibling.InnerText.Replace("&nbsp;", "");
-            Console.WriteLine($"过期时间:{dateTime}");
+            Log.Information($"过期时间:{dateTime}");
             DateTime expireTime = Convert.ToDateTime(dateTime);
             expireTime = expireTime.AddSeconds(3);
-            Console.WriteLine($"下次执行时间:{expireTime:yyyy-MM-dd HH:mm:ss}");
+            Log.Information($"下次执行时间:{expireTime:yyyy-MM-dd HH:mm:ss}");
             JobManager.AddJob(Buy, s => s.ToRunOnceAt(expireTime));
             return true;
         });
@@ -103,14 +115,14 @@ public class App
     static void Buy()
     {
 
-        ErgodicAction(() =>
+        Extensions.ErgodicAction(() =>
         {
             RestRequest reques = new RestRequest("https://ggok.xyz/user/buy", Method.Post);
             dic["referer"] = "https://ggok.xyz/user/shop";
             reques.AddHeaders(dic);
             reques.AddObject(new { coupon = "", shop = "8", autorenew = "1", disableothers = "1" });
             var res = client?.PostAsync<Result>(reques)?.Result;
-            Console.WriteLine(res?.msg);
+            Log.Information(res?.msg);
             CheckExpirationTimeAndAddSchedule();
             return true;
         });
@@ -119,7 +131,7 @@ public class App
     }
     static void Login(string? email, string? passwd)
     {
-        ErgodicAction(() =>
+        Extensions.ErgodicAction(() =>
         {
             Thread.Sleep(2000);
             RestRequest reques = new RestRequest("https://ggok.xyz/auth/login");
@@ -130,42 +142,17 @@ public class App
             {
                 client.CookieContainer.Add(res.Cookies);
                 var json = JsonConvert.DeserializeObject<Result>(res?.Content);
-                Console.WriteLine(json?.msg);
+                Log.Information(json?.msg);
                 return true;
             }
-            System.Console.WriteLine(res?.ErrorMessage);
+            Log.Information(res?.ErrorMessage);
             return false;
         });
-       
+
     }
     #endregion
 
-    /// <summary>
-    /// 循环执行方法 直到次数用完 或者方法返回true
-    /// </summary>
-    /// <param name="action"></param>
-    /// <param name="ergodicNumber"></param>
-    static void ErgodicAction(Func<bool> action, int ergodicNumber = 5, int sleepSecond = 1)
-    {
-        for (int i = 0; i < ergodicNumber; i++)
-        {
-            Thread.Sleep(sleepSecond * 1000);
-            bool isActionSuccess;
-            try
-            {
-                isActionSuccess = action();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                isActionSuccess = false;
-            }
-            if (isActionSuccess)
-            {
-                break;
-            }
-        }
-    }
+
 }
 
 
@@ -177,29 +164,3 @@ public class Result
     public int ret { get; set; }
     public string msg { get; set; }
 }
-
-public static class Extensions
-{
-    public static bool IsEmpty(this string value)
-    {
-        return string.IsNullOrEmpty(value);
-    }
-    public static string GetEnvironmentVariable(string key)
-    {
-        string str = Environment.GetEnvironmentVariable(key, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? EnvironmentVariableTarget.Machine : EnvironmentVariableTarget.Process);
-        return str;
-
-    }
-    public static int? GetEnvironmentVariableInt(string key)
-    {
-        try
-        {
-            return int.Parse(GetEnvironmentVariable(key));
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-}
-
