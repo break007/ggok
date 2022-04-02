@@ -88,7 +88,7 @@ public class App
             reques.AddHeaders(dic);
             var res = client.PostAsync<Result>(reques).Result;
             Log.Information(res.msg);
-            Notify.Send("签到", res.msg);
+            Notify.Send("ggok签到", res.msg);
             return true;
         }, 5);
     }
