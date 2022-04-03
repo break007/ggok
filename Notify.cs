@@ -8,7 +8,7 @@ public class Notify
     {
         var request = new RestRequest("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=c4de16aa-91a8-496b-ae54-2c5d48bdc86d");
         request.AddHeader("Content-Type", "application/json");
-        request.AddJsonBody(new { msgtype = "text", text = new { content = title+"："+content } });
+        request.AddJsonBody(new { msgtype = "text", text = new { content = $" {DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}{title}{Environment.NewLine}{content}" } });
         var response = client.ExecutePostAsync(request);
         Log.Information(response.Result.Content);
 

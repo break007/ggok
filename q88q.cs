@@ -9,7 +9,7 @@ public class q8qserver
 
     static RestClient client = new RestClient(baseUrl: "https://www.q88q.cyou/");
 
-    public async void Run()
+    public  void Run()
     {
         #region 初始化请求环境
         string email = Environment.GetEnvironmentVariable("email");
@@ -24,7 +24,7 @@ public class q8qserver
         
         #region 初始化任务调度
         ///每3天登录
-        JobManager.AddJob(async () =>
+        JobManager.AddJob(() =>
         {
             Login(email, passwd);
         }, s => s.ToRunEvery(3).Days().At(0, 1));
@@ -45,6 +45,7 @@ public class q8qserver
             client.CookieContainer.Add(response?.Cookies);
             var jsondata = JsonConvert.DeserializeObject<Result>(response?.Content);
             Log.Information(jsondata.msg);
+            Notify.Send("q88q签到", jsondata.msg);
             return true;
         });
     }
@@ -57,6 +58,7 @@ public class q8qserver
             var res = response.Content;
             var jsondata = JsonConvert.DeserializeObject<Result>(res);
             Log.Information(jsondata.msg);
+             Notify.Send("q88q签到", jsondata.msg);
             return true;
         });
 
