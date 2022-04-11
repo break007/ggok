@@ -29,7 +29,7 @@ public static class Extensions
     /// </summary>
     /// <param name="action"></param>
     /// <param name="ergodicNumber"></param>
-    public static void ErgodicAction(Func<bool> action, int ergodicNumber = 5, int sleepSecond = 1)
+    public static void ErgodicAction(Func<bool> action, Action<string> reject = null, int ergodicNumber = 5, int sleepSecond = 1)
     {
         for (int i = 0; i < ergodicNumber; i++)
         {
@@ -41,7 +41,8 @@ public static class Extensions
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "执行方法出错");
+                if (reject != null)
+                    reject(ex.Message);
                 isActionSuccess = false;
             }
             if (isActionSuccess)

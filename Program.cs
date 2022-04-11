@@ -90,7 +90,7 @@ public class App
             Log.Information(res.msg);
             Notify.Send("ggok签到", res.msg);
             return true;
-        }, 5);
+        });
     }
     static void CheckExpirationTimeAndAddSchedule()
     {
@@ -123,7 +123,7 @@ public class App
             reques.AddHeaders(dic);
             reques.AddObject(new { coupon = "", shop = "8", autorenew = "1", disableothers = "1" });
             var res = client?.PostAsync<Result>(reques)?.Result;
-            Log.Information(res?.msg);
+            Log.Information("ggok:buymessage:{msg}", res?.msg);
             Notify.Send("购买", res?.msg);
             CheckExpirationTimeAndAddSchedule();
             return true;
@@ -144,11 +144,13 @@ public class App
             {
                 client.CookieContainer.Add(res.Cookies);
                 var json = JsonConvert.DeserializeObject<Result>(res?.Content);
-                Log.Information(json?.msg);
-                Notify.Send("登录", json?.msg);
+                Log.Information("ggok:登录成功");
                 return true;
             }
-            Log.Information(res?.ErrorMessage);
+            else
+            {
+                Log.Information("ggok:登录失败");
+            }
             return false;
         });
 
