@@ -7,29 +7,12 @@ public static class Extensions
     {
         return string.IsNullOrEmpty(value);
     }
-    public static string GetEnvironmentVariable(string key)
-    {
-        string str = Environment.GetEnvironmentVariable(key, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? EnvironmentVariableTarget.Machine : EnvironmentVariableTarget.Process);
-        return str;
-
-    }
-    public static int? GetEnvironmentVariableInt(string key)
-    {
-        try
-        {
-            return int.Parse(GetEnvironmentVariable(key));
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
     /// <summary>
     /// 循环执行方法 直到次数用完 或者方法返回true
     /// </summary>
     /// <param name="action"></param>
     /// <param name="ergodicNumber"></param>
-    public static void ErgodicAction(Func<bool> action, Action<string> reject = null, int ergodicNumber = 5, int sleepSecond = 1)
+    public static void ErgodicAction(Func<bool> action, int ergodicNumber = 5, int sleepSecond = 1)
     {
         for (int i = 0; i < ergodicNumber; i++)
         {
@@ -41,9 +24,8 @@ public static class Extensions
             }
             catch (Exception ex)
             {
-                if (reject != null)
-                    reject(ex.Message);
-                isActionSuccess = false;
+                Log.Error(ex, ex.ToString());
+               isActionSuccess=false;
             }
             if (isActionSuccess)
             {

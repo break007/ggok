@@ -33,8 +33,6 @@ Console.CancelKeyPress += ((s, a) =>
 #endregion
 public class App
 {
-
-
     static RestClient client = new RestClient();
     const string Version = "1.0";
     static Dictionary<string, string> dic = new Dictionary<string, string>(){
@@ -53,10 +51,6 @@ public class App
         string email = Environment.GetEnvironmentVariable("email");
         string passwd = Environment.GetEnvironmentVariable("passwd");
         ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
-        // if (email.IsEmpty() || passwd.IsEmpty())
-        // {
-        //     dic.Add("Cookie", cookie);
-        // }
         #endregion
 
         #region 初始化任务调度
@@ -159,11 +153,6 @@ public class App
 
 
 }
-
-
-
-
-
 public class Result
 {
     public int ret { get; set; }
