@@ -15,7 +15,7 @@ AutoResetEvent _closingEvent = new AutoResetEvent(false);
 #region 配置日志
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    .WriteTo.Console()
+    .WriteTo.Console(outputTemplate:"[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 #endregion
 Log.Information("net6.0 version");
@@ -66,6 +66,7 @@ public class App
         #region 默认先进行一次登录和一次检查过期时间
         Login(email, passwd);
         CheckExpirationTimeAndAddSchedule();
+        CheckIn();
         #endregion
 
 
