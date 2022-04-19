@@ -54,13 +54,13 @@ public class App
         #endregion
 
         #region 初始化任务调度
-        ///每3天登录
+        ///每1天登录
         JobManager.AddJob(() =>
         {
             Login(email, passwd);
-        }, s => s.ToRunEvery(3).Days().At(0, 1));
+        }, s => s.ToRunEvery(1).Days().At(0, 1));
         //每一天签到
-        JobManager.AddJob(CheckIn, s => s.ToRunEvery(1).Days().At(0, 1));
+        JobManager.AddJob(CheckIn, s => s.ToRunEvery(1).Days().At(0, 2));
         #endregion
 
         #region 默认先进行一次登录和一次检查过期时间
