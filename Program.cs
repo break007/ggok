@@ -50,6 +50,7 @@ public class App
         string cookie = Environment.GetEnvironmentVariable("cookie");
         string email = Environment.GetEnvironmentVariable("email");
         string passwd = Environment.GetEnvironmentVariable("passwd");
+        System.Console.WriteLine($"email:{email}");
         ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
         #endregion
 

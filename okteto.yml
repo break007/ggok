@@ -15,7 +15,8 @@ build:
 
 # The deploy section defines how to deploy your development environment
 # More info: https://www.okteto.com/docs/reference/manifest/#deploy
-# deploy:
+deploy:
+  compose: docker-compose.yml
 #   commands:
 #   - name: Deploy
 #     command: echo 'Replace this line with the proper 'helm' or 'kubectl' commands to deploy your development environment'
@@ -31,7 +32,7 @@ build:
 # More info: https://www.okteto.com/docs/reference/manifest/#dev
 dev:
   ggok:
-    image: okteto/dotnetcore:6
+    image: mcr.microsoft.com/dotnet/sdk:6.0
     command: bash
     remote: 22000
     sync:

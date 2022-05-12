@@ -1,0 +1,7 @@
+version: '2'
+services:
+  ggok:
+    build: .
+    environment:
+      - email=xxxxx
+      - passwd=ccccc
